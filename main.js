@@ -48,7 +48,7 @@ addEventListener("mousemove", (e) =>{
     }
 });
 
-addEventListener("mouseup", handleDrag);
+addEventListener("mousedown", handleDrag);
 
 function getClosestPoints(radius,x, y ){
     let closestPoints = [];
