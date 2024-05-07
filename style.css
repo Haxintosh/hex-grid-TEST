@@ -12,3 +12,7 @@ canvas{
 #overlayCanvas{
     z-index: 2;
 }
+
+#lineCanvas{
+    z-index: 3;
+}
