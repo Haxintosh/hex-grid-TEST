@@ -1,5 +1,5 @@
 export default class HexGrid{
-    constructor(radius, xOffset, yOffset, isEditable, parentDiv, width, height, style){
+    constructor(radius, xOffset, yOffset, isEditable, parentDiv, width, height, style, callback, goodPattern){
         this.radius = radius;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
@@ -14,6 +14,8 @@ export default class HexGrid{
         this.currentDrawingPattern="";
         this.lastPoint= null;
         this.isDrawing = false;
+        this.callback = callback;
+        this.goodPattern = goodPattern;
         this.init();
     }
 
@@ -46,8 +48,9 @@ export default class HexGrid{
         this.lineCtx.strokeStyle = this.style.lineColor;
         this.lineCtx.lineWidth = this.style.lineWidth;
         this.lineCtx.lineCap = this.style.lineCap;
-
+        this.pattern="";
         this.lines = [];
+        this.currentLines =[];
 
         addEventListener("mousemove", (e) =>{
             let closestPoints = this.getClosestPoints(this.radius*2, e.clientX, e.clientY);
@@ -126,11 +129,34 @@ export default class HexGrid{
             this.lineCtx.stroke();
             this.lineCtx.closePath();
         }
+        for (const element of this.patterns) {
+            if (element.isDrawn) {
+                console.log("skipping");
+                continue;
+            } else {
+                element.isDrawn = true;
+            }
+            console.log("not skipping")
+            for (const line of this.lines) {
+                if (element.isCorrect) {
+                    this.ctx.strokeStyle = this.style.goodDotColor;
+                } else {
+                    this.ctx.strokeStyle = this.style.badDotColor;
+                }
+                this.ctx.beginPath();
+                this.ctx.moveTo(line.start.x, line.start.y);
+                this.ctx.lineTo(line.end.x, line.end.y);
+                this.ctx.stroke();
+                this.ctx.closePath();
+                this.ctx.strokeStyle = this.style.lineColor;
+            }
+            this.ctx.strokeStyle = this.style.lineColor;
+        }
     }
 
     drawLineFromDrag(e){
         this.lineCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        this.drawLinesFromArr(this.lines);
+        this.drawLinesFromArr(this.currentLines);
         let closestPoints = this.getClosestPoints(this.radius * 2, e.clientX, e.clientY);
         for (let i in closestPoints) { // Math.abs(lastPoint.x - closestPoints[i].coord.x) < radius * 2 && Math.abs(lastPoint.y - closestPoints[i].coord.y)
             // how fucking not ergonomic
@@ -149,6 +175,7 @@ export default class HexGrid{
                     return;
                 }
                 this.lines.push({start: this.lastPoint, end: closestPoints[i].coord});
+                this.currentLines.push({start: this.lastPoint, end: closestPoints[i].coord});
                 this.lineCtx.beginPath();
                 this.lineCtx.moveTo(this.lastPoint.x, this.lastPoint.y);
                 this.lineCtx.stroke();
@@ -217,9 +244,16 @@ export default class HexGrid{
             this.isDrawing = false;
             this.lineCanvas.removeEventListener("mousemove", this.mousemoveListener, true);
             this.lineCtx.clearRect(0, 0, this.lineCanvas.width, this.lineCanvas.height);
-            this.drawLinesFromArr(this.lines);
+            this.drawLinesFromArr(this.currentLines);
             console.log(this.pattern);
+            if (this.pattern === this.goodPattern){
+                this.callback();
+            }
+            this.patterns.push({pattern:this.pattern, isGood:true, lines: this.currentLines, isDrawn: false});
             this.pattern="";
+            this.currentLines = [];
+            this.lineCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
+            this.drawLinesFromArr(this.currentLines);
             return;
         }
         this.isDrawing = true;
