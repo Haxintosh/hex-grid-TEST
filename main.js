@@ -37,108 +37,18 @@ let isDrawing = false;
 generateHexGrid(radius, xOffset, yOffset);
 
 addEventListener("mousemove", (e) =>{
-    let closestPoints = getClosestPoints(radius*2, e.clientX, e.clientY);
+    let closestPoints = this.getClosestPoints(radius*2, e.clientX, e.clientY);
     overlayCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     for (const element of closestPoints) {
         if (element.distance<radius/2){
-            drawCircle(5, element.coord.x, element.coord.y, '#0f0', overlayCtx);
+            this.drawCircle(5, element.coord.x, element.coord.y, '#0f0', overlayCtx);
             continue;
         }
-        drawCircle(5, element.coord.x, element.coord.y, '#f00', overlayCtx);
+        this.drawCircle(5, element.coord.x, element.coord.y, '#f00', overlayCtx);
     }
 });
 
 addEventListener("mousedown", handleDrag);
-
-function getClosestPoints(radius,x, y ){
-    let closestPoints = [];
-    for (const element of uniquePoints) {
-        let point = {};
-        let distance = distance2d(element.x - x, element.y - y);
-        if (distance < radius) {
-            point.coord = element;
-            point.distance = distance;
-            closestPoints.push(point);
-        }
-    }
-    return closestPoints;
-}
-
-let lines = [];
-let lastPoint;
-function handleDrag(e){
-    console.log("fired")
-    if (isDrawing){
-        isDrawing = false;
-        lineCanvas.removeEventListener("mousemove", drawLineFromDrag, true);
-        lineCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        drawLinesFromArr(lines);
-        console.log(pattern);
-        pattern="";
-        console.log("stopped drawing");
-        return;
-    }
-    isDrawing = true;
-    let closestPoints = getClosestPoints(radius*2, e.clientX, e.clientY);
-    for (const element of closestPoints) {
-        if (element.distance < radius / 2) {
-            lastPoint = element.coord;
-            lineCanvas.addEventListener("mousemove", drawLineFromDrag, true);
-            break;
-        }
-    }
-}
-let isDrawingLine = false;
-let pattern = "";
-function drawLineFromDrag(e){
-    if (isDrawingLine){ // in case of race conditions
-        return;
-    }
-    isDrawingLine = true;
-    lineCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    drawLinesFromArr(lines);
-    let closestPoints = getClosestPoints(radius * 2, e.clientX, e.clientY);
-    for (let i in closestPoints) { // Math.abs(lastPoint.x - closestPoints[i].coord.x) < radius * 2 && Math.abs(lastPoint.y - closestPoints[i].coord.y)
-        // how fucking ergonomic
-        if (closestPoints[i].distance < radius / 2 && distance2d(Math.abs(lastPoint.x - closestPoints[i].coord.x), Math.abs(lastPoint.y - closestPoints[i].coord.y)) < radius * 2 && !lines.find(l => l.start.x === lastPoint.x && l.start.y === lastPoint.y && l.end.x === closestPoints[i].coord.x && l.end.y === closestPoints[i].coord.y)){
-            if (Math.round(closestPoints[i].coord.x) === Math.round(lastPoint.x) && Math.round(closestPoints[i].coord.y)===Math.round(lastPoint.y)){
-                isDrawingLine=false;
-                return;
-            }
-            lines.push({start: lastPoint, end: closestPoints[i].coord});
-            lineCtx.beginPath();
-            lineCtx.moveTo(lastPoint.x, lastPoint.y);
-            lineCtx.lineTo(closestPoints[i].coord.x, closestPoints[i].coord.y);
-            lineCtx.stroke();
-            lineCtx.closePath();
-            console.log("snapped to point");
-            const angle = Math.round(degFromPoint(lastPoint.x - closestPoints[i].coord.x, lastPoint.y - closestPoints[i].coord.y));
-            console.log(angle);
-            if (angle === 0 || angle === 180){
-                pattern += "w";
-            } else if (angle === 60) {
-                pattern += "a";
-            } else if (angle === -60){
-                pattern += "d";
-            } else if (angle === 120) {
-                pattern += "q";
-            } else if (angle === -120) {
-                pattern += "e";
-            }
-            lastPoint = closestPoints[i].coord;
-            isDrawingLine=false;
-            return;
-        }
-    }
-    lineCtx.beginPath();
-    lineCtx.moveTo(lastPoint.x, lastPoint.y);
-    lineCtx.lineTo(e.clientX, e.clientY);
-    lineCtx.stroke();
-    lineCtx.closePath();
-    isDrawingLine=false;
-}
-
-function
 
 generateHexGrid(radius, xOffset, yOffset);
 
@@ -154,7 +64,8 @@ class HexGrid{
         this.patterns= [];
         this.parentDiv = parentDiv;
         this.style = style;
-
+        this.currentDrawingPattern="";
+        this.lastPoint= null;
         this.init();
     }
 
@@ -189,6 +100,8 @@ class HexGrid{
         this.lineCtx.lineCap = this.style.lineCap;
 
         this.lines = [];
+
+        addEventListener("mousedown", this.handleDrag);
     }
 
     // the hex grid
@@ -236,12 +149,12 @@ class HexGrid{
     }
 
     // draws
-    drawCircle(radius = this.radius, centerX, centerY, color = this.style.dotColor, ctx = this.ctx){
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.closePath();
+    drawCircle(radius = this.radius, centerX, centerY, color = this.style.dotColor){
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        this.ctx.fillStyle = color;
+        this.ctx.fill();
+        this.ctx.closePath();
     }
 
     drawLinesFromArr(arr){
@@ -253,6 +166,48 @@ class HexGrid{
             this.lineCtx.closePath();
         }
     }
+
+    drawLineFromDrag(e){
+        this.lineCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        this.drawLinesFromArr(lines);
+        let closestPoints = this.getClosestPoints(this.radius * 2, e.clientX, e.clientY);
+        for (let i in closestPoints) { // Math.abs(lastPoint.x - closestPoints[i].coord.x) < radius * 2 && Math.abs(lastPoint.y - closestPoints[i].coord.y)
+            // how fucking ergonomic
+            if (closestPoints[i].distance < this.radius / 2 && this.distance2d(Math.abs(this.lastPoint.x - closestPoints[i].coord.x), Math.abs(this.lastPoint.y - closestPoints[i].coord.y)) < this.radius * 2 && !this.lines.find(l => l.start.x === this.lastPoint.x && l.start.y === this.lastPoint.y && l.end.x === closestPoints[i].coord.x && l.end.y === closestPoints[i].coord.y)){
+                if (Math.round(closestPoints[i].coord.x) === Math.round(this.lastPoint.x) && Math.round(closestPoints[i].coord.y)===Math.round(this.lastPoint.y)){
+                    return;
+                }
+                this.lines.push({start: this.lastPoint, end: closestPoints[i].coord});
+                this.lineCtx.beginPath();
+                this.lineCtx.moveTo(this.lastPoint.x, this.lastPoint.y);
+                this.lineCtx.stroke();
+                this.lineCtx.closePath();
+                this.lineCtx.lineTo(closestPoints[i].coord.x, closestPoints[i].coord.y);
+                console.log("snapped to point");
+                const angle = Math.round(this.degFromPoint(this.lastPoint.x - closestPoints[i].coord.x, this.lastPoint.y - closestPoints[i].coord.y));
+                console.log(angle);
+                if (angle === 0 || angle === 180){
+                    this.pattern += "w";
+                } else if (angle === 60) {
+                    this.pattern += "a";
+                } else if (angle === -60){
+                    this.pattern += "d";
+                } else if (angle === 120) {
+                    this.pattern += "q";
+                } else if (angle === -120) {
+                    this.pattern += "e";
+                }
+                this.lastPoint = closestPoints[i].coord;
+                return;
+            }
+        }
+        this.lineCtx.beginPath();
+        this.lineCtx.moveTo(lastPoint.x, lastPoint.y);
+        this.lineCtx.lineTo(e.clientX, e.clientY);
+        this.lineCtx.stroke();
+        this.lineCtx.closePath();
+    }
+
 
     // helpers
     degFromPoint(x, y){
@@ -269,5 +224,41 @@ class HexGrid{
 
     floorToPrecision(n, precision){
         return Math.floor(n * Math.pow(10, precision) / Math.pow(10, precision));
+    }
+
+    getClosestPoints(radius,x, y){
+        let closestPoints = [];
+        for (const element of this.uniquePoints) {
+            let point = {};
+            let distance = this.distance2d(element.x - x, element.y - y);
+            if (distance < radius) {
+                point.coord = element;
+                point.distance = distance;
+                closestPoints.push(point);
+            }
+        }
+        return closestPoints;
+    }
+
+    // Handlers
+    handleDrag(e){
+        if (this.isDrawing){
+            this.isDrawing = false;
+            this.lineCanvas.removeEventListener("mousemove", this.drawLineFromDrag, true);
+            this.lineCtx.clearRect(0, 0, this.lineCanvas.width, this.lineCanvas.height);
+            this.drawLinesFromArr(lines);
+            console.log(this.pattern);
+            this.pattern="";
+            return;
+        }
+        this.isDrawing = true;
+        let closestPoints = this.getClosestPoints(this.radius*2, e.clientX, e.clientY);
+        for (const element of closestPoints) {
+            if (element.distance < this.radius / 2) {
+                this.lastPoint = element.coord;
+                this.lineCanvas.addEventListener("mousemove", this.drawLineFromDrag, true);
+                break;
+            }
+        }
     }
 }
