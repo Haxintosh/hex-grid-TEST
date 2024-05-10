@@ -138,82 +138,136 @@ function drawLineFromDrag(e){
     isDrawingLine=false;
 }
 
-
-function drawLinesFromArr(arr){
-    for (const element of arr) {
-        lineCtx.beginPath();
-        lineCtx.moveTo(element.start.x, element.start.y);
-        lineCtx.lineTo(element.end.x, element.end.y);
-        lineCtx.stroke();
-        lineCtx.closePath();
-    }
-}
-
-function distance2d(x, y){
-    return Math.sqrt(Math.abs(x)**2+Math.abs(y)**2);
-}
-
-function generateHexGrid(radius, xOffset, yOffset){
-    let nColumns = Math.floor(canvasElement.width / (radius * 2))+1;
-    let nRows = Math.floor(canvasElement.height / (radius * 2))-1;
-
-    for (let i = 0; i < nColumns; i++) {
-        for (let j = 0; j < nRows; j++) {
-            let x = xOffset + i * Math.sqrt(3)*radius ;1
-            let y = yOffset + j * radius * 3;
-            generateHexPoint(radius, x, y, 3);
-        }
-    }
-
-    drawGrid(uniquePoints);
-}
-
-function generateHexPoint(radius, xOffset, yOffset, nSide) {
-    let points = [];
-    for (let i = 0; i < nSide; i++) {
-        let angleRad = degToRad(-90) + (2 * Math.PI / nSide) * i;
-        let x = xOffset + radius * Math.cos(angleRad);
-        let y = yOffset + radius * Math.sin(angleRad);
-        if (uniquePoints.find(p => floorToPrecision(p.x, 100) === floorToPrecision(x, 100) && floorToPrecision(p.y, 100) === floorToPrecision(y, 100))) {
-            continue;
-        }
-        uniquePoints.push({ x, y });
-        points.push({ x, y });
-    }
-    return points;
-}
-
-function drawGrid(points){
-    if (points) {
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (const element of points) {
-            drawCircle(2, element.x, element.y, '#fff', ctx);
-        }
-        ctx.closePath();
-        ctx.fill();
-    }
-}
-
-function drawCircle(radius, centerX, centerY, color, ctx){
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.closePath();
-}
-
-function degToRad(deg){
-    return deg * Math.PI / 180;
-}
-
-function floorToPrecision(n, precision){
-    return Math.floor(n * Math.pow(10, precision) / Math.pow(10, precision));
-}
+function
 
 generateHexGrid(radius, xOffset, yOffset);
 
-function degFromPoint(x, y){
-    return Math.atan2(y, x) * 180 / Math.PI;
+class HexGrid{
+    constructor(radius, xOffset, yOffset, isEditable, parentDiv, width, height, style){
+        this.radius = radius;
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+        this.isEditable = isEditable;
+        this.height = height;
+        this.width = width;
+        this.uniquePoints = [];
+        this.patterns= [];
+        this.parentDiv = parentDiv;
+        this.style = style;
+
+        this.init();
+    }
+
+    init(){
+        const canvasElement = this.parentDiv.createElement('canvas');
+        canvasElement.width = this.width;
+        canvasElement.height = this.height;
+        this.bgCanvas = canvasElement;
+
+        const overlayCanvas = this.parentDiv.createElement('canvas');
+        overlayCanvas.width = this.width;
+        overlayCanvas.height = this.height;
+        this.highlightCanvas = overlayCanvas;
+
+        const lineCanvas = this.parentDiv.createElement('canvas');
+        lineCanvas.width = this.width;
+        lineCanvas.height = this.height;
+        this.lineCanvas = lineCanvas;
+
+        this.parentDiv.appendChild(canvasElement);
+        this.parentDiv.appendChild(overlayCanvas);
+        this.parentDiv.appendChild(lineCanvas);
+
+        this.ctx = canvasElement.getContext('2d');
+        this.overlayCtx = overlayCanvas.getContext('2d');
+        this.lineCtx = lineCanvas.getContext('2d');
+
+        this.ctx.fillStyle = this.style.bgColor;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        this.lineCtx.strokeStyle = this.style.lineColor;
+        this.lineCtx.lineWidth = this.style.lineWidth;
+        this.lineCtx.lineCap = this.style.lineCap;
+
+        this.lines = [];
+    }
+
+    // the hex grid
+    generateHexGrid(radius = this.radius, xOffset = this.xOffset, yOffset = this.yOffset){
+        this.nColumns = Math.floor(this.bgCanvas.width / (radius * 2))+1;
+        this.nRows = Math.floor(this.bgCanvas.height / (radius * 2))-1;
+
+        for (let i = 0; i < this.nColumns; i++) {
+            for (let j = 0; j < this.nRows; j++) {
+                let x = xOffset + i * Math.sqrt(3)*radius ;
+                let y = yOffset + j * radius * 3;
+                this.generateHexPoint(radius, x, y, 3);
+            }
+        }
+
+        this.drawGrid();
+    }
+
+    drawGrid(points = this.uniquePoints){
+        if (points) {
+            this.ctx.fillStyle = '#fff';
+            this.ctx.beginPath();
+            this.ctx.moveTo(points[0].x, points[0].y);
+            for (const element of points) {
+                this.drawCircle(this.radius, element.x, element.y, this.style.dotColor, this.ctx);
+            }
+            this.ctx.closePath();
+            this.ctx.fill();
+        }
+    }
+
+    generateHexPoint(radius = this.radius, xOffset = this.xOffset, yOffset = this.yOffset, nSide = 3) {
+        let points = [];
+        for (let i = 0; i < nSide; i++) {
+            let angleRad = this.degToRad(-90) + (2 * Math.PI / nSide) * i;
+            let x = xOffset + radius * Math.cos(angleRad);
+            let y = yOffset + radius * Math.sin(angleRad);
+            if (this.uniquePoints.find(p => this.floorToPrecision(p.x, 100) === this.floorToPrecision(x, 100) && this.floorToPrecision(p.y, 100) === this.floorToPrecision(y, 100))) {
+                continue;
+            }
+            this.uniquePoints.push({ x, y });
+            points.push({ x, y });
+        }
+        return points;
+    }
+
+    // draws
+    drawCircle(radius = this.radius, centerX, centerY, color = this.style.dotColor, ctx = this.ctx){
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    drawLinesFromArr(arr){
+        for (const element of arr) {
+            this.lineCtx.beginPath();
+            this.lineCtx.moveTo(element.start.x, element.start.y);
+            this.lineCtx.lineTo(element.end.x, element.end.y);
+            this.lineCtx.stroke();
+            this.lineCtx.closePath();
+        }
+    }
+
+    // helpers
+    degFromPoint(x, y){
+        return Math.atan2(y, x) * 180 / Math.PI;
+    }
+
+    degToRad(deg){
+        return deg * Math.PI / 180;
+    }
+
+    distance2d(x, y){
+        return Math.sqrt(Math.abs(x)**2+Math.abs(y)**2);
+    }
+
+    floorToPrecision(n, precision){
+        return Math.floor(n * Math.pow(10, precision) / Math.pow(10, precision));
+    }
 }
