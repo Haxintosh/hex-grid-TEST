@@ -1,10 +1,9 @@
 import './style.css'
-import HexGrid from './HexGrid.js'
+// import Cryptex from './Cryptex.js';
+// const parentDiv = document.getElementById('Cryptex');
+// const goodAnswer = [1, 2, 3, 4, 5];
+// const cryptex = new Cryptex(parentDiv, 5, goodAnswer, () => {
+//     console.log('You did it!');
+//     cryptex.destroy();
+// });
 
-const parentDiv = document.getElementById('HexGrid');
-
-const grid = new HexGrid(50, 100, 100, true, parentDiv, window.innerWidth, window.innerHeight, {bgColor: '#181825', dotColor: '#fff', lineColor: '#fff', lineWidth: 5, lineCap: 'round', dotRadius: 3, goodDotColor: '#00ff00', badDotColor: '#ff0000'}, love, "deqawad");
-
-function love(){
-    console.log('I love you');
-}
