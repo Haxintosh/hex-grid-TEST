@@ -31,9 +31,11 @@ export default class Inventory{
           flex-direction: column;
           width: fit-content;
           top:50%;
+          left:1%;
           /* right: 0; */
           transform: translate(0,-50%);
           margin:10px;
+          transition: left 200ms;
         }
         .hotbarSlot{
           position: relative;
@@ -92,6 +94,15 @@ export default class Inventory{
     clear(){
         this.items = [];
         this.normalize();
+    }
+
+    hide(){
+        this.hotbarWrapper.style.left = '-400px';
+    }
+
+    show(){
+        this.hotbarWrapper.style.left = '1%';
+
     }
 }
 
@@ -231,6 +242,7 @@ class Draggable{
             Draggable.isGlobalDragging = false;
             this.unhighlight();
             this.isDragging = false;
+            dropZone[0].object.callback();
         }
     }
 
@@ -276,13 +288,14 @@ class Draggable{
 }
 
 export class DropZone{
-    constructor(width, height, x, y, parentDiv){
+    constructor(width, height, x, y, parentDiv, callback) {
         this.width = width;
         this.height = height;
         this.x = x;
         this.y = y;
         this.parentDiv = parentDiv;
         this.items = [];
+        this.callback = callback;
         this.init();
         Draggable.dropZones.push(this);
     }
