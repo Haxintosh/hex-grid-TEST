@@ -1,5 +1,6 @@
 import './style.css'
-import Dialogue from "./Dialogue.js";
+import Inventory, {DropZone, Item} from "./Inventory.js";
+
 const parent = document.getElementById('Cryptex')
 
 // const electrical = new ElectricalPuzzle(parent, 500, 500, {
@@ -8,39 +9,29 @@ const parent = document.getElementById('Cryptex')
 //     bgColor: 'black'
 // });
 
-// const inv = new Inventory(parent, {}, 5);
-// const item1 = new Item({url: 'https://picsum.photos/50'}, 'item1', 'description', inv, 1);
-// const item2 = new Item({url: 'https://picsum.photos/50'}, 'item2', 'description', inv, 1);
-// const item3 = new Item({url: 'https://picsum.photos/50'}, 'item3', 'description', inv, 1);
-// const item4 = new Item({url: 'https://picsum.photos/50'}, 'item4', 'description', inv, 2);
-//
-// inv.addItem(item1);
-// inv.addItem(item2);
-// inv.addItem(item3);
-// inv.addItem(item4);
-//
+const inv = new Inventory(parent, {}, 8);
+const item1 = new Item({url: 'https://picsum.photos/50'}, 'item1', 'description', inv, 1);
+const item2 = new Item({url: 'https://picsum.photos/50'}, 'item2', 'description', inv, 1);
+const item3 = new Item({url: 'https://picsum.photos/50'}, 'item3', 'description', inv, 1);
+const item4 = new Item({url: 'https://picsum.photos/50'}, 'item4', 'description', inv, 2);
+const item5 = new Item({url: 'https://picsum.photos/50'}, 'item5', 'description', inv, 2);
+const item6 = new Item({url: 'https://picsum.photos/50'}, 'item6', 'description', inv, 2);
+const item7 = new Item({url: 'https://picsum.photos/50'}, 'item7', 'description', inv, 3);
+const item8 = new Item({url: 'https://picsum.photos/50'}, 'item8', 'description', inv, 3);
+
+inv.addItem(item1);
+inv.addItem(item2);
+inv.addItem(item3);
+inv.addItem(item4);
+inv.addItem(item5);
+inv.addItem(item6);
+inv.addItem(item7);
+inv.addItem(item8);
+inv.normalize();
 // inv.removeItem(item2);
-//
-// const dropZone = new DropZone(100, 100, 500, 500, parent);
-// const dropZone2 = new DropZone(150, 150, 200, 300, parent);
 
-const dialogueText = [
-    {
-        name: 'Flagellum Dei',
-        text: 'For I am Attila the Hun, the scourge of God. If you had not committed great sins, God would not have sent a punishment like me upon you.'
-    },
-    {
-        name: 'Flagellum Dei',
-        text: 'Shame on you for your despicable sins and your great wickedness. You have brought great suffering upon yourselves.'
-    },
-    {
-        name: 'Flagellum Dei',
-        text: 'Now eat this sucker!'
-    }
-]
-const Dialogue1 = new Dialogue(dialogueText, 40, false, 'audio/click.ogg', parent, () => {
-    console.log('done');
-    Dialogue1.destroy();
-});
-
-Dialogue1.startFromOrigin();
+const dropZone = new DropZone(100, 100, 500, 500, parent);
+const dropZone2 = new DropZone(100, 100, 200, 300, parent);
+const dropZone3 = new DropZone(100, 100, 200, 200, parent);
+const dropZone4 = new DropZone(100, 100, 400, 400, parent);
+const dropZone5 = new DropZone(100, 100, 300, 300, parent);

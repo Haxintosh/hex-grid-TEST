@@ -64,7 +64,6 @@ export default class Inventory{
         // add item to inventory
         this.items.push(item);
         const currIndex = this.items.length - 1;
-        console.log(this.slotElements);
         this.slotElements[currIndex].element.innerHTML = item.img;
         this.slotElements[currIndex].item = item;
     }
@@ -81,10 +80,12 @@ export default class Inventory{
     normalize(){
         for (const e of this.slotElements){
             e.element.innerHTML = "";
+            e.isDraggable = false;
         }
         this.items = this.items.filter(item => item !== null);
         this.items.forEach((item, i) => {
             this.slotElements[i].element.innerHTML = item.img;
+            this.slotElements[i].isDraggable = true;
         });
     }
 
@@ -99,7 +100,7 @@ export class Item{
         this.name = name;
         this.description = description;
         this.imgSrc = img;
-        this.img = `<img src="${this.imgSrc.url}" alt="${this.name}">`;
+        this.img = `<img src="${this.imgSrc.url}" alt="${this.name}" width="100%" height="100%">`;
     }
 }
 
@@ -117,6 +118,7 @@ class Draggable{
         this.handleMouseUp = this.handleMouseUp.bind(this);
         this.handleMouseMove = this.handleMouseMove.bind(this);
 
+        this.isDraggable = false;
         this.init();
     }
 
@@ -130,9 +132,13 @@ class Draggable{
         if (Draggable.isGlobalDragging){
             return;
         }
+
+        if (!this.isDraggable){
+            return;
+        }
         e.preventDefault();
 
-        console.log(this.element);
+        this.isDragging = true;
         const slotId = this.element.id.replace("slot", "");
         const tempElement = this.element.cloneNode(true);
         tempElement.draggable = false;
@@ -149,40 +155,82 @@ class Draggable{
     }
 
     handleMouseMove(e){
+        if (!this.isDraggable){
+            return;
+        }
+
+        if (!this.isDragging){
+            return;
+        }
+
         this.dragElement.style.left = e.clientX+10+'px';
         this.dragElement.style.top = e.clientY+10+'px';
         const dropZone = this.getClosestDropZone();
-        console.log(dropZone);
-        for (const e of dropZone) {
-            e.element.style.border = '5px dashed #007AFF';
+        if (dropZone.length === 0){
+            this.unhighlightDropZones();
+            return;
         }
-        console.log("fired");
+        for (const e of dropZone) {
+            e.object.element.style.border = '5px dashed rgb(99, 99, 102)';
+            dropZone[0].object.element.style.border = '5px dashed #007AFF';
+        }
         this.getClosestDropZone();
     }
 
     handleMouseUp(e) {
+        if (!this.isDragging){
+            return;
+        }
+        if (!this.isDraggable){
+            return;
+        }
+
         if (this.dragElement) {
+            this.dragElement.style.transition = 'left 0.5s, top 0.5s';
+
             const dropZone = this.getClosestDropZone();
-            for (const e of dropZone) {
-                e.element.style.border = '5px solid rgb(99, 99, 102)';
+            if (dropZone.length === 0){
+                this.dragElement.remove();
+                this.dragElement = null;
+                Draggable.isGlobalDragging = false;
+                this.unhighlight();
+                document.removeEventListener('mousemove', this.handleMouseMove, true);
+                this.isDragging = false;
+                this.unhighlightDropZones();
+                return;
             }
+
+            if (dropZone[0].object.items.length >= 1){
+                console.log("Slot full");
+                this.dragElement.remove();
+                this.dragElement = null;
+                Draggable.isGlobalDragging = false;
+                this.unhighlight();
+                document.removeEventListener('mousemove', this.handleMouseMove, true);
+                this.isDragging = false;
+                this.unhighlightDropZones();
+                return;
+            }
+
+            this.unhighlightDropZones();
             document.removeEventListener('mousemove', this.handleMouseMove, true);
 
             const rect = this.dragElement.getBoundingClientRect();
-            const targetRect = dropZone[0].element.getBoundingClientRect();
+            const targetRect = dropZone[0].object.element.getBoundingClientRect();
             const finalCoord = {
                 x: targetRect.x + targetRect.width / 2 - rect.width / 2,
                 y: targetRect.y + targetRect.height / 2 - rect.height / 2
             };
-            dropZone[0].items.push(this.item);
-            this.dragElement.style.left = finalCoord.x  + 'px'; // finalCoord.x - (rect.width / 2)
-            this.dragElement.style.top = finalCoord.y + 'px'; // finalCoord.y - (rect.height / 2)
+
+            dropZone[0].object.items.push(this.item);
+            setTimeout(() => {
+                this.dragElement.style.left = finalCoord.x  + 'px'; // finalCoord.x - (rect.width / 2)
+                this.dragElement.style.top = finalCoord.y + 'px'; // finalCoord.y - (rect.height / 2)
+            }, 0);
             this.inv.removeItem(this.item);
-            console.log(this.item);
-            console.log(this.inv.items);
-            console.log(dropZone[0].items);
             Draggable.isGlobalDragging = false;
             this.unhighlight();
+            this.isDragging = false;
         }
     }
 
@@ -192,14 +240,15 @@ class Draggable{
         let closestDropZones = [];
         for (const dropZone of Draggable.dropZones){
             const center = this.getCenter();
-            const dropZoneCenter = {x:dropZone.x, y:dropZone.y};
+            const dropZoneRect = dropZone.element.getBoundingClientRect();
+
+            const dropZoneCenter = {x:dropZoneRect.left+dropZoneRect.width/2, y:dropZoneRect.top+dropZoneRect.height/2};
             const dist = Math.hypot(Math.abs(center.x - dropZoneCenter.x), Math.abs(center.y - dropZoneCenter.y));
-            console.log(dist);
             if (dist < MAXDIST){
                 closestDropZones.push({object:dropZone, dist:dist});
             }
         }
-        return closestDropZones.sort((a,b) => a.dist - b.dist).map(e => e.object);
+        return closestDropZones.sort((a, b) => a.dist - b.dist);
     }
 
     getCenter(){
@@ -216,6 +265,13 @@ class Draggable{
 
     unhighlight() {
         this.element.style.border = '5px solid black';
+    }
+
+    unhighlightDropZones(){
+        for (const e of Draggable.dropZones){
+            e.element.style.border = '5px solid rgb(99, 99, 102)';
+        }
+
     }
 }
 
@@ -243,14 +299,14 @@ export class DropZone{
 
         // #007AFF
         const styles = `
-.dropZones{
-    position: relative;
-    border: 5px solid rgb(99, 99, 102);
-    border-radius: 10px;
-    background-color: #FFFFFF;
-    pointer-events: none;
-     transition: border-style 0.5s, border-color 0.5s;
-}
+        .dropZones{
+            position: relative;
+            border: 5px solid rgb(99, 99, 102);
+            border-radius: 10px;
+            background-color: #FFFFFF;
+            pointer-events: none;
+             transition: border-style 0.5s, border-color 0.5s;
+        }
         `
         const styleSheet = document.createElement("style");
         styleSheet.innerText = styles;
