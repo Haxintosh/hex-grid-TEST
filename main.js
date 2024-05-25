@@ -1,16 +1,23 @@
 import './style.css'
-import Inventory, {DropZone, Item} from "./Inventory.js";
-import Crafting from "./Crafting.js";
+// import Inventory, {DropZone, Item} from "./Inventory.js";
+// import Crafting from "./Crafting.js";\]
+// import Cryptex  from "./Cryptex.js";
+//
+// const parent = document.getElementById('Cryptex')
+// const cryptex = new Cryptex(parent, 5, [1, 5, 5, 5, 5], ()=>{
+//     console.log('callback');
+// });
+import ElectricalPuzzle from "./Electrical.js";
 
 const parent = document.getElementById('Cryptex')
 
-// const electrical = new ElectricalPuzzle(parent, 500, 500, {
-//     wireWidth: 10,
-//     wireHeight: 20,
-//     bgColor: 'black'
-// });
+const electrical = new ElectricalPuzzle(parent, 500, 500, {
+    wireWidth: 10,
+    wireHeight: 20,
+    bgColor: 'black'
+});
 
-const inv = new Inventory(parent, {}, 8);
+// const inv = new Inventory(parent, {}, 8);
 // const item1 = new Item({url: 'https://picsum.photos/50'}, 'item1', 'description', inv, 1);
 // const item2 = new Item({url: 'https://picsum.photos/50'}, 'item2', 'description', inv, 1);
 // const item3 = new Item({url: 'https://picsum.photos/50'}, 'item3', 'description', inv, 1);
@@ -59,12 +66,12 @@ const inv = new Inventory(parent, {}, 8);
 // }
 // const dropzonev2 = new DropZone(100, 100, window.innerWidth/2-100, window.innerHeight/2-100, parent);
 
-const crafting = new Crafting(inv, ['item1', 'item2'], () => {
-    console.log('recipe found, callback');
-}, 5, 100, 100, parent);
-
-for (let i = 0; i<7; i++){
-    const item = new Item({url: 'https://picsum.photos/50'}, 'item'+i, 'description', inv, 1);
-    inv.addItem(item);
-}
-inv.normalize();
+// const crafting = new Crafting(inv, ['item1', 'item2'], () => {
+//     console.log('recipe found, callback');
+// }, 5, 100, 100, parent);
+//
+// for (let i = 0; i<7; i++){
+//     const item = new Item({url: 'https://picsum.photos/50'}, 'item'+i, 'description', inv, 1);
+//     inv.addItem(item);
+// }
+// inv.normalize();

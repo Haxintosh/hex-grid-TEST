@@ -1,4 +1,4 @@
-export default class HexGrid{
+ export default class HexGrid{
     constructor(radius, xOffset, yOffset, isEditable, parentDiv, width, height, style, callback, goodPattern){
         this.radius = radius;
         this.xOffset = xOffset;

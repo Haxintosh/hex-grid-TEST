@@ -3,6 +3,8 @@ export default class Inventory{
         this.parentDiv = parentDiv;
         this.styles = styles;
         this.nSlots = nSlots;
+
+        this.isShown = true;
         this.init();
     }
 
@@ -98,11 +100,20 @@ export default class Inventory{
 
     hide(){
         this.hotbarWrapper.style.left = '-400px';
+        this.isShown = false;
     }
 
     show(){
         this.hotbarWrapper.style.left = '1%';
+        this.isShown = true;
+    }
 
+    toggle(){
+        if (this.isShown){
+            this.hide();
+        } else {
+            this.show();
+        }
     }
 }
 
