@@ -7,17 +7,15 @@ import './style.css'
 // const cryptex = new Cryptex(parent, 5, [1, 5, 5, 5, 5], ()=>{
 //     console.log('callback');
 // });
-import ElectricalPuzzle from "./Electrical.js";
+// import ElectricalPuzzle from "./Electrical.js";
 
-const parent = document.getElementById('Cryptex')
-
-const electrical = new ElectricalPuzzle(parent, 500, 500, {
-    wireWidth: 10,
-    wireHeight: 40,
-    bgColor: 'black'
-}, ()=>{
-    console.log('callback');
-});
+// const electrical = new ElectricalPuzzle(parent, 500, 500, {
+//     wireWidth: 10,
+//     wireHeight: 40,
+//     bgColor: 'black'
+// }, ()=>{
+//     console.log('callback');
+// });
 
 // const inv = new Inventory(parent, {}, 8);
 // const item1 = new Item({url: 'https://picsum.photos/50'}, 'item1', 'description', inv, 1);

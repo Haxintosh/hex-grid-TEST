@@ -207,3 +207,24 @@ fuseBox.checkForItem(); // check if the item is in the drop zone, true if correc
 // checkForItem also calls the callback if the item is in the drop zone
 // checkForItem is called automatically when the item is in the drop zone
 ```
+## SpinnyVault
+```js
+import SpinnyVault from "./SpinnyVault.js";
+const parent = document.getElementById('Cryptex')
+const vault = new SpinnyVault(parent, 100, 100, 'images/cross-iso.jpg', 5, ()=>{
+    console.log('callback');
+});
+```
+### Constructor
+```js
+new SpinnyVault(parentElement, x, y, src, nTimes, callback, accel, speedLimit); // E, int, int, str, int, func
+// x, y = coord of the vault
+// src = url of the image
+// nTimes = number of times to spin
+// accel = acceleration of the spin
+// speedLimit = max speed of the spin
+```
+### Methods
+```js
+vault.destroy(); // destroy
+```
