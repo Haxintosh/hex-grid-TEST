@@ -336,4 +336,9 @@ export class DropZone{
         styleSheet.innerText = styles;
         document.head.appendChild(styleSheet);
     }
+
+    destroy(){
+        this.element.remove();
+        Draggable.dropZones = Draggable.dropZones.filter(e => e !== this);
+    }
 }

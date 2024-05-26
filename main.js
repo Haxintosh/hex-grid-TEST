@@ -13,8 +13,10 @@ const parent = document.getElementById('Cryptex')
 
 const electrical = new ElectricalPuzzle(parent, 500, 500, {
     wireWidth: 10,
-    wireHeight: 20,
+    wireHeight: 40,
     bgColor: 'black'
+}, ()=>{
+    console.log('callback');
 });
 
 // const inv = new Inventory(parent, {}, 8);

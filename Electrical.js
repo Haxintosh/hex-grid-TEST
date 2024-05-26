@@ -1,11 +1,12 @@
 export default class ElectricalPuzzle {
-    constructor(parentDiv, width, height, styles, solution) {
+    constructor(parentDiv, width, height, styles, calback) {
         this.parentDiv = parentDiv;
         this.width = width;
         this.height = height;
         this.styles = styles;
-        this.solution = solution; // [['red, blue'], ['blue', 'green'], ['green', 'yellow'], ['yellow', 'purple'], ['purple', 'red']]
         this.points = {top: [], bottom: []};
+        this.callback = calback;
+        this.completed = [];
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.init();
     }
@@ -16,18 +17,22 @@ export default class ElectricalPuzzle {
         this.bgCanvas.height = this.height;
         this.ctx = this.bgCanvas.getContext('2d');
         this.parentDiv.appendChild(this.bgCanvas);
+        this.bgCanvas.id = 'Electrical-bgCanvas';
 
         this.interactionCanvas = document.createElement('canvas');
         this.interactionCanvas.width = this.width;
         this.interactionCanvas.height = this.height;
         this.interactionCtx = this.interactionCanvas.getContext('2d');
         this.parentDiv.appendChild(this.interactionCanvas);
+        this.interactionCanvas.id = 'Electrical-interactionCanvas';
+
         this.interactionCanvas.addEventListener('click', this.handleClick.bind(this));
+
         this.ctx.fillStyle = this.styles.bgColor;
         this.ctx.fillRect(0, 0, this.width, this.height);
 
-        let initX = 10;
-        let endY = 380;
+        // let initX = 10;
+        let endY = this.interactionCanvas.height-this.styles.wireHeight;
 
         let arrColor = ['red', 'blue', 'green', 'yellow', 'purple']
         this.shuffleArray(arrColor);
@@ -36,20 +41,38 @@ export default class ElectricalPuzzle {
         let topArr = [...arrColor];
 
         for (let i = 0; i < 5; i++){
+            let initX = this.interactionCanvas.width/6*(i+1);
             this.ctx.fillStyle = topArr[i];
-            this.ctx.fillRect(initX, 0, this.styles.wireWidth, this.styles.wireHeight);
+            this.ctx.fillRect(initX-this.styles.wireWidth/2, 0, this.styles.wireWidth, this.styles.wireHeight);
             this.ctx.fillStyle = "white";
-            this.points.top.push({x: initX + this.styles.wireWidth/2, y: this.styles.wireHeight, color: topArr[i]});
-            this.drawCircle(10, initX + this.styles.wireWidth/2, this.styles.wireHeight, 'white', this.ctx)
+            this.points.top.push({x: initX, y: this.styles.wireHeight, color: topArr[i], isInteractable: true});
+            this.drawCircle(10, initX, this.styles.wireHeight, 'white', this.ctx)
 
             this.ctx.fillStyle = bottomArr[i];
-            this.ctx.fillRect(initX, endY, this.styles.wireWidth, this.styles.wireHeight);
+            this.ctx.fillRect(initX-this.styles.wireWidth/2, endY, this.styles.wireWidth, this.styles.wireHeight);
             this.ctx.fillStyle = "white";
-            this.points.bottom.push({x: initX + this.styles.wireWidth/2, y: endY, color: bottomArr[i]});
-            this.drawCircle(10, initX + this.styles.wireWidth/2, endY, 'white', this.ctx)
-
-            initX += 100;
+            this.points.bottom.push({x: initX, y: endY, color: bottomArr[i], isInteractable: true});
+            this.drawCircle(10, initX, endY, 'white', this.ctx)
         }
+
+        const styles = `
+            #Electrical-bgCanvas {
+                border: 3px solid white;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            #Electrical-interactionCanvas {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+            `
+        const styleSheet = document.createElement("style")
+        styleSheet.innerText = styles;
+        document.head.appendChild(styleSheet);
     }
 
     shuffleArray(array) {
@@ -69,20 +92,35 @@ export default class ElectricalPuzzle {
         if (pts.length === 0) return;
 
         console.log(x, y, pts);
-        if (!this.currentPts) {
+        if (!this.currentPts && pts[0].isInteractable){
             this.currentPts = pts;
             this.interactionCanvas.addEventListener('mousemove', this.handleMouseMove, true);
         } else {
-            if (this.currentPts.y === pts.y) return;
+            if (!this.currentPts) return;
+            if (this.currentPts[0].y === pts[0].y) return;
+            if (!pts[0].isInteractable) return;
+            if (this.currentPts[0].color !== pts[0].color) return;
+
+            console.log(this.currentPts)
             this.ctx.beginPath();
             this.ctx.moveTo(pts[0].x, pts[0].y);
-            this.ctx.strokeStyle = 'white';
+            this.ctx.strokeStyle = this.currentPts[0].color;
             this.ctx.lineWidth = 5;
             this.ctx.lineTo(this.currentPts[0].x, this.currentPts[0].y);
             this.ctx.stroke();
             this.ctx.closePath();
-            this.currentPts = null;
             this.interactionCanvas.removeEventListener('mousemove', this.handleMouseMove, true);
+            this.interactionCtx.clearRect(0, 0, this.width, this.height);
+            ['top', 'bottom'].forEach(key => {
+                const found = this.points[key].find(e => e === pts[0] || e === this.currentPts[0]);
+                if (found){
+                    found.isInteractable = false;
+                }
+            });
+            this.currentPts = null;
+            this.redrawCircles(this.ctx);
+            this.completed.push(pts[0].color);
+            console.log(this.checkAnswer());
         }
     }
 
@@ -91,11 +129,12 @@ export default class ElectricalPuzzle {
         this.interactionCtx.clearRect(0, 0, this.width, this.height);
         this.interactionCtx.beginPath();
         this.interactionCtx.moveTo(pts[0].x, pts[0].y);
-        this.interactionCtx.strokeStyle = 'white';
+        this.interactionCtx.strokeStyle = pts[0].color;
         this.interactionCtx.lineWidth = 5;
         this.interactionCtx.lineTo(e.offsetX, e.offsetY);
         this.interactionCtx.stroke();
         this.interactionCtx.closePath();
+        this.redrawCircles(this.interactionCtx)
     }
 
     getClosestPoints(x, y) {
@@ -121,5 +160,26 @@ export default class ElectricalPuzzle {
         ctx.fillStyle = color;
         ctx.fill();
         ctx.closePath();
+    }
+
+    redrawCircles(ctx){
+        for (const e of this.points.top){
+            this.drawCircle(10, e.x, e.y, 'white', ctx)
+        }
+        for (const e of this.points.bottom){
+            this.drawCircle(10, e.x, e.y, 'white', ctx)
+        }
+    }
+
+    checkAnswer(){
+        if (this.completed.length === 5){
+            this.callback();
+            return true;
+        }
+        return false;
+    }
+
+    destroy(){
+        this.parentDiv.innerHTML = '';
     }
 }

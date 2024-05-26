@@ -159,5 +159,51 @@ width, height, x, y = int // size and position of the zone (bug here, the positi
 ```js
 Nothing yet...
 ```
-
-
+## Electrical
+```js
+import Electrical from './Electrical.js';
+const electrical = new ElectricalPuzzle(parent, 500, 500, {
+    wireWidth: 10,
+    wireHeight: 40,
+    bgColor: 'black'
+}, ()=>{
+    console.log('callback');
+});
+```
+### Constructor
+```js
+new ElectricalPuzzle(parentElement, width, height, styles, callback); // E, int, int, Obj, func
+styles = {
+    wireWidth: int,
+    wireHeight: int,
+    bgColor: str
+}
+```
+### Methods
+```js
+electrical.destroy(); // destroy
+electrical.checkAnswer(); // check if the puzzle is solved, true if solved, false if not
+// checkAnswer also calls the callback if the puzzle is solved
+// checkAnswer is called automatically when the puzzle is solved
+```
+## FuseBox
+```js
+import FuseBox from './FuseBox.js';
+const fuseBox = new FuseBox(parent, 500, 500, 100, 100, item, ()=>{
+    console.log('callback');
+});
+```
+### Constructor
+```js
+new FuseBox(parentElement, x, y, width, height, item, callback); // E, int, int, int, int, Item, func
+// x, y = coord of the drop zone
+// width, height = size of the drop zone
+// item = item to put in the drop zone
+```
+### Methods
+```js
+fuseBox.destroy(); // destroy
+fuseBox.checkForItem(); // check if the item is in the drop zone, true if correct, false if not
+// checkForItem also calls the callback if the item is in the drop zone
+// checkForItem is called automatically when the item is in the drop zone
+```
