@@ -30,6 +30,10 @@ export default class Dialogue {
 
         this.parent.appendChild(this.dialogueElement);
         this.lastTime = 0;
+
+        this.dialogueElement.style.zIndex = -100;
+
+        this.next = this.next.bind(this);
         this.init();
     }
 
@@ -47,6 +51,7 @@ export default class Dialogue {
             justify-content: center;
             align-items: center;
             gap: 10px;
+            user-select: none;
         }
         
         .nameBox{
@@ -97,9 +102,6 @@ export default class Dialogue {
             <rect x="45" y="19" width="9" height="9"/>
         </svg>
         `;
-
-        this.updateText(0);
-        this.textBox.addEventListener("click", this.next.bind(this));
     }
 
     updateText(timeStamp) {
@@ -154,8 +156,11 @@ export default class Dialogue {
     // Methods
     startFromOrigin() {
         // call this method to start the dialogue
+        this.dialogueElement.style.zIndex = 100;
         this.isTyping = true;
         this.currentText = 0;
+        this.updateText(0);
+        this.textBox.addEventListener("click", this.next);
     }
 
     stop() {
@@ -180,10 +185,13 @@ export default class Dialogue {
         // remove the dialogue
         this.parent.removeChild(this.dialogueElement);
         document.head.removeChild(this.styleSheet);
+        this.sfx.pause();
+        this.sfx.currentTime = 0;
     }
 
     // Event Handlers
     next() {
+        console.log("next");
         if (this.isFinished) {
             this.callback();
             return;
