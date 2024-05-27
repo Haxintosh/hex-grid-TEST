@@ -19,24 +19,50 @@ export default class SpinnyVault{
     }
 
     init(){
+        this.bgImage = document.createElement('img');
+        this.bgImage.src = 'images/vault-pzl.png';
+        this.bgImage.style.width = '50%';
+        this.bgImage.style.height = 'fit-content';
+        this.bgImage.style.position = 'absolute';
+        this.bgImage.style.top = '50%';
+        this.bgImage.style.left = '50%';
+        this.bgImage.style.transform = 'translate(-50%, -50%)';
+        this.bgImage.useMap = '#image-map';
+        this.bgImage.zIndex = 10;
+        this.parent.appendChild(this.bgImage);
+
+        this.mapResizerJS = document.createElement('script');
+        this.mapResizerJS.src = 'external/imageMapResizer.min.js';
+        document.head.appendChild(this.mapResizerJS);
+
+        this.mapResizerJS.onload = () => {
+            console.log('loaded');
+            imageMapResize();
+
+        }
+
+        this.mainMap = document.createElement('map');
+        this.mainMap.name = 'image-map';
+        this.mainMap.id = 'image-map';
+        this.bgImage.appendChild(this.mainMap);
+        this.mapArea = document.createElement('area');
+        this.mapArea.target = '';
+        this.mapArea.alt = 'spin button';
+        this.mapArea.title = '';
+        this.mapArea.coords = '139,231,191,281';
+        this.mapArea.shape = 'rect';
+        this.mainMap.appendChild(this.mapArea);
+        this.mapArea.addEventListener('click', this.clickHandler.bind(this));
+
         this.mainWrapper = document.createElement('div');
         this.mainWrapper.classList.add('spinnyVaultWrapper');
         this.parent.appendChild(this.mainWrapper);
 
         this.img = document.createElement('img');
         this.img.src = this.src;
-        this.img.style.width = '25%';
-        this.img.style.height = '25%';
+        this.img.style.width = '50%';
+        this.img.style.height = '50%';
         this.mainWrapper.appendChild(this.img);
-
-        const br = document.createElement('br');
-        this.mainWrapper.appendChild(br);
-
-        this.rotateButton = document.createElement('button');
-        this.rotateButton.id = 'rotateButton';
-        this.rotateButton.innerText = 'Crack Vault';
-        this.rotateButton.addEventListener('click', this.clickHandler.bind(this));
-        this.mainWrapper.appendChild(this.rotateButton);
 
         this.indicatorDiv = document.createElement('div');
         this.indicatorDiv.style.width = '200px';
@@ -48,12 +74,6 @@ export default class SpinnyVault{
         this.indicator.style.height = '100%';
         this.indicator.style.backgroundColor = 'green';
 
-        this.indicatorText = document.createElement('div');
-        this.indicatorText.innerText = 'Vault Vulnerable When Green';
-        this.indicatorText.id = 'indicatorText';
-
-
-        this.indicatorDiv.appendChild(this.indicatorText);
         this.indicatorDiv.appendChild(this.indicator);
         this.mainWrapper.appendChild(this.indicatorDiv);
         const styles = `
@@ -67,7 +87,7 @@ export default class SpinnyVault{
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-             
+                pointer-events: none;
             }
             
             .spinnyVaultWrapper img{

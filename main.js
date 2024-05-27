@@ -2,14 +2,12 @@ import './style.css'
 // import Inventory, {DropZone, Item} from "./Inventory.js";
 // import Crafting from "./Crafting.js";\]
 // import Cryptex  from "./Cryptex.js";
-//
-// const parent = document.getElementById('Cryptex')
-// const cryptex = new Cryptex(parent, 5, [1, 5, 5, 5, 5], ()=>{
-//     console.log('callback');
-// });
-// import ElectricalPuzzle from "./Electrical.js";
 
-// const electrical = new ElectricalPuzzle(parent, 500, 500, {
+import SpinnyVault from "./SpinnyVault.js";
+const parent = document.getElementById('Cryptex')
+const vault = new SpinnyVault(parent, 100, 100, 'images/theWehl.png', 5, ()=> {
+    console.log('callback');
+});// const electrical = new ElectricalPuzzle(parent, 500, 500, {
 //     wireWidth: 10,
 //     wireHeight: 40,
 //     bgColor: 'black'
