@@ -120,9 +120,11 @@ export default class Dialogue {
                 // increment the current letter
                 this.currentText++;
 
-                this.sfx.pause();
-                this.sfx.currentTime = 0;
-                this.sfx.play();
+                try {
+                    this.sfx.pause();
+                    this.sfx.currentTime = 0;
+                    this.sfx.play();
+                } catch (e) {}
 
                 // check for end of chapter
                 if (

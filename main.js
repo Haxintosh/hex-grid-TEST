@@ -2,9 +2,8 @@ import './style.css'
 // import Inventory, {DropZone, Item} from "./Inventory.js";
 // import Crafting from "./Crafting.js";\]
 // import Cryptex  from "./Cryptex.js";
-import Dialogue from "./Dialogue.js";
+// import Dialogue from "./Dialogue.js";
 // import SpinnyVault from "./SpinnyVault.js";
-const parent = document.getElementById('Cryptex')
 // const vault = new SpinnyVault(parent, 100, 100, 'images/theWehl.png', 3, ()=> {
 //     console.log('callback');
 // });// const electrical = new ElectricalPuzzle(parent, 500, 500, {
@@ -74,41 +73,49 @@ const parent = document.getElementById('Cryptex')
 // }
 // inv.normalize();
 
-const dialogueText = [
-    {
-        name: 'Flagellum Dei',
-        text: 'For I am Attila the Hun, the scourge of God. If you had not committed great sins, God would not have sent a punishment like me upon you.'
-    },
-    {
-        name: 'Flagellum Dei',
-        text: 'Shame on you for your despicable sins and your great wickedness. You have brought great suffering upon yourselves.'
-    },
-    {
-        name: 'Flagellum Dei',
-        text: 'Now eat this sucker!'
-    }
-]
+// const dialogueText = [
+//     {
+//         name: 'Flagellum Dei',
+//         text: 'For I am Attila the Hun, the scourge of God. If you had not committed great sins, God would not have sent a punishment like me upon you.'
+//     },
+//     {
+//         name: 'Flagellum Dei',
+//         text: 'Shame on you for your despicable sins and your great wickedness. You have brought great suffering upon yourselves.'
+//     },
+//     {
+//         name: 'Flagellum Dei',
+//         text: 'Now eat this sucker!'
+//     }
+// ]
+//
+// const dialogueText2 = [
+//     {
+//         name: 'Flagellum Dei',
+//         text: 'You have brought great suffering upon yourselves.'
+//     },
+//     {
+//         name: 'Flagellum Dei',
+//         text: 'Now eat this sucker!'
+//     }
+// ]
+//
+// const Dialogue2 = new Dialogue(dialogueText2, 40, false, 'audio/click.ogg', parent, () => {
+//     console.log('done 2');
+//
+// });
+//
+// const Dialogue1 = new Dialogue(dialogueText, 40, false, 'audio/click.ogg', parent, () => {
+//     console.log('done');
+//     Dialogue1.destroy();
+//     Dialogue2.startFromOrigin();
+// });
+//
+// Dialogue1.startFromOrigin();
 
-const dialogueText2 = [
-    {
-        name: 'Flagellum Dei',
-        text: 'You have brought great suffering upon yourselves.'
-    },
-    {
-        name: 'Flagellum Dei',
-        text: 'Now eat this sucker!'
-    }
-]
+import Vent from "./Vent.js";
 
-const Dialogue2 = new Dialogue(dialogueText2, 40, false, 'audio/click.ogg', parent, () => {
-    console.log('done 2');
+const parent = document.getElementById('Cryptex')
 
+const vent = new Vent(parent, () => {
+    console.log('callback');
 });
-
-const Dialogue1 = new Dialogue(dialogueText, 40, false, 'audio/click.ogg', parent, () => {
-    console.log('done');
-    Dialogue1.destroy();
-    Dialogue2.startFromOrigin();
-});
-
-Dialogue1.startFromOrigin();
