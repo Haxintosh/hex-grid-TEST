@@ -16,3 +16,9 @@ canvas{
 #lineCanvas{
     z-index: 3;
 }
+
+body{
+    margin: 0;
+    padding: 0;
+    background: #44475A;
+}
