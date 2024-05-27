@@ -5,7 +5,7 @@ import './style.css'
 
 import SpinnyVault from "./SpinnyVault.js";
 const parent = document.getElementById('Cryptex')
-const vault = new SpinnyVault(parent, 100, 100, 'images/theWehl.png', 5, ()=> {
+const vault = new SpinnyVault(parent, 100, 100, 'images/theWehl.png', 3, ()=> {
     console.log('callback');
 });// const electrical = new ElectricalPuzzle(parent, 500, 500, {
 //     wireWidth: 10,

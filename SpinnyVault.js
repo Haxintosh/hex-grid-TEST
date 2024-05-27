@@ -1,5 +1,5 @@
 export default class SpinnyVault{
-    constructor(parent, x, y, src, nTimes, callback, accel = 0.4, speedLimit = 4) {
+    constructor(parent, x, y, src, nTimes, callback, accel = 0.1, speedLimit = 2) {
         this.x = x;
         this.y = y;
         this.src = src;
@@ -60,22 +60,17 @@ export default class SpinnyVault{
 
         this.img = document.createElement('img');
         this.img.src = this.src;
-        this.img.style.width = '50%';
-        this.img.style.height = '50%';
-        this.mainWrapper.appendChild(this.img);
+        this.img.style.width = '25%';
+        // this.img.style.height = '25%';
+        this.img.style.position = 'absolute';
+        this.img.style.top = '23vh';
+        this.img.style.left = '50%';
+        // this.img.style.transform = 'translate(-50%, -50%)';
+        this.parent.appendChild(this.img);
 
-        this.indicatorDiv = document.createElement('div');
-        this.indicatorDiv.style.width = '200px';
-        this.indicatorDiv.style.height = '50px';
-        this.indicatorDiv.id = 'indicatorDiv';
+        this.resize();
+        document.addEventListener('resize', this.resize.bind(this));
 
-        this.indicator = document.createElement('div');
-        this.indicator.style.width = '100%';
-        this.indicator.style.height = '100%';
-        this.indicator.style.backgroundColor = 'green';
-
-        this.indicatorDiv.appendChild(this.indicator);
-        this.mainWrapper.appendChild(this.indicatorDiv);
         const styles = `
             .spinnyVaultWrapper{
                 display: flex;
@@ -130,7 +125,9 @@ export default class SpinnyVault{
         this.styleSheet.innerText = styles;
         document.head.appendChild(this.styleSheet);
 
-        this.rotate();
+        setTimeout(() => {
+            this.rotate();
+        }, 1000);
     }
 
     rotate(){
@@ -149,17 +146,18 @@ export default class SpinnyVault{
             this.correctAngle = this.getAngleFromCoterminal(this.genRandomDeg() +  this.direction*angle+240);
         }
         if (angle < this.correctAngle - 60 || angle > this.correctAngle + 60){
-            this.indicator.style.backgroundColor = 'red';
+            this.bgImage.src = 'images/vault-pzl_red.png';
         } else{
-            this.indicator.style.backgroundColor = 'green';
+            this.bgImage.src = 'images/vault-pzl_green.png';
         }
         requestAnimationFrame(this.rotate.bind(this));
     }
 
     clickHandler(e){
         this.direction *= -1;
-        if (this.indicator.style.backgroundColor === 'green'){
+        if (this.bgImage.src.includes('green')){
             this.goodTimes++;
+            console.log("suceeded", this.goodTimes);
             if (this.goodTimes === this.nTimes){
                 this.callback();
             }
@@ -168,7 +166,7 @@ export default class SpinnyVault{
         }
         if (this.correctAngle){
             this.correctAngle=null;
-            this.indicator.style.backgroundColor = 'red';
+            this.bgImage.src = 'images/vault-pzl_red.png';
         }
     }
 
@@ -182,5 +180,13 @@ export default class SpinnyVault{
 
     getAngleFromCoterminal(angle){
         return Math.abs(angle % 360);
+    }
+
+    resize(){
+        this.img.style.transform = `translate(-50%, -50%)`;
+        const rect = this.img.getBoundingClientRect();
+        this.img.style.left = `${rect.left}px`;
+        this.img.style.top = `${rect.top}px`;
+        this.img.style.transform = "";
     }
 }
