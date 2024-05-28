@@ -112,13 +112,13 @@ import './style.css'
 //
 // Dialogue1.startFromOrigin();
 
-import Vent from "./Vent.js";
-
-const parent = document.getElementById('Cryptex')
-
-const vent = new Vent(parent, () => {
-    console.log('callback');
-});
+// import Vent from "./Vent.js";
+//
+// const parent = document.getElementById('Cryptex')
+//
+// const vent = new Vent(parent, () => {
+//     console.log('callback');
+// });
 
 // import ElectricalPuzzle from "./Electrical.js";
 // const parent = document.getElementById('Cryptex');
@@ -129,3 +129,9 @@ const vent = new Vent(parent, () => {
 // }, ()=>{
 //     console.log('callback');
 // });
+
+import FuseBox from "./FuseBox.js";
+const parent = document.getElementById('Cryptex');
+const fuseBox = new FuseBox(parent, window.innerWidth/2 - 100, window.innerHeight/2-100, 100, 100, {name: 'item1'}, () => {
+    console.log('callback');
+});

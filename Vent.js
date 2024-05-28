@@ -55,7 +55,8 @@ export default class Vent {
     }
 
     handleClick(e){
-        const {layerX, layerY} = e;
+        const {layerX, layerY} = e; // eh Chromium handles layerX/Y differently than gecko
+        console.log(layerX, layerY);
         const closestPt = this.getClosestPoint(layerX, layerY);
         if (closestPt === null) return;
         this.pts.splice(this.pts.indexOf(closestPt), 1);
