@@ -130,8 +130,12 @@ import './style.css'
 //     console.log('callback');
 // });
 
-import FuseBox from "./FuseBox.js";
+// import FuseBox from "./FuseBox.js";
 const parent = document.getElementById('Cryptex');
-const fuseBox = new FuseBox(parent, window.innerWidth/2 - 100, window.innerHeight/2-100, 100, 100, {name: 'item1'}, () => {
+// const fuseBox = new FuseBox(parent, window.innerWidth/2 - 100, window.innerHeight/2-100, 100, 100, {name: 'item1'}, () => {
+//     console.log('callback');
+// });
+import Cryptex from "./Cryptex.js";
+const cryptex = new Cryptex(parent, 4, [1, 2, 3, 4], () => {
     console.log('callback');
 });

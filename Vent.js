@@ -12,6 +12,7 @@ export default class Vent {
         this.parent.appendChild(this.ventCanvas);
         this.ventCanvas.classList.add('ventCanvas');
 
+
         const styles = `
             .ventCanvas {
                 position: absolute;
@@ -87,6 +88,4 @@ export default class Vent {
             this.callback();
         }
     }
-
-
 }
