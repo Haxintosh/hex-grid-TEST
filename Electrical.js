@@ -8,10 +8,8 @@ export default class ElectricalPuzzle {
         this.callback = calback;
         this.completed = [];
         this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.init();
-    }
-
-    init(){
+        this.bgImage = new Image();
+        this.bgImage.src = 'images/electrical-wire-pzl.png';
         this.bgCanvas = document.createElement('canvas');
         this.bgCanvas.width = this.width;
         this.bgCanvas.height = this.height;
@@ -26,12 +24,22 @@ export default class ElectricalPuzzle {
         this.parentDiv.appendChild(this.interactionCanvas);
         this.interactionCanvas.id = 'Electrical-interactionCanvas';
 
+        this.bgImage.onload = () => {
+            this.bgCanvas.width = this.width;
+            this.bgCanvas.height = this.height;
+            this.ctx.drawImage(this.bgImage, 0, 0, this.width, this.height);
+            this.init();
+        }
+    }
+
+    init(){
         this.interactionCanvas.addEventListener('click', this.handleClick.bind(this));
 
-        this.ctx.fillStyle = this.styles.bgColor;
-        this.ctx.fillRect(0, 0, this.width, this.height);
+        // this.ctx.fillStyle = this.styles.bgColor;
+        // this.ctx.fillRect(0, 0, this.width, this.height);
 
         // let initX = 10;
+        const initY = 28;
         let endY = this.interactionCanvas.height-this.styles.wireHeight;
 
         let arrColor = ['red', 'blue', 'green', 'yellow', 'purple']
@@ -43,16 +51,16 @@ export default class ElectricalPuzzle {
         for (let i = 0; i < 5; i++){
             let initX = this.interactionCanvas.width/6*(i+1);
             this.ctx.fillStyle = topArr[i];
-            this.ctx.fillRect(initX-this.styles.wireWidth/2, 0, this.styles.wireWidth, this.styles.wireHeight);
+            this.ctx.fillRect(initX-this.styles.wireWidth/2, initY, this.styles.wireWidth, this.styles.wireHeight);
             this.ctx.fillStyle = "white";
-            this.points.top.push({x: initX, y: this.styles.wireHeight, color: topArr[i], isInteractable: true});
-            this.drawCircle(10, initX, this.styles.wireHeight, 'white', this.ctx)
+            this.points.top.push({x: initX, y: this.styles.wireHeight+initY, color: topArr[i], isInteractable: true});
+            this.drawCircle(10, initX, this.styles.wireHeight+initY, 'white', this.ctx)
 
             this.ctx.fillStyle = bottomArr[i];
-            this.ctx.fillRect(initX-this.styles.wireWidth/2, endY, this.styles.wireWidth, this.styles.wireHeight);
+            this.ctx.fillRect(initX-this.styles.wireWidth/2, endY-initY, this.styles.wireWidth, this.styles.wireHeight);
             this.ctx.fillStyle = "white";
-            this.points.bottom.push({x: initX, y: endY, color: bottomArr[i], isInteractable: true});
-            this.drawCircle(10, initX, endY, 'white', this.ctx)
+            this.points.bottom.push({x: initX, y: endY-initY, color: bottomArr[i], isInteractable: true});
+            this.drawCircle(10, initX, endY-initY, 'white', this.ctx)
         }
 
         const styles = `

@@ -119,3 +119,13 @@ const parent = document.getElementById('Cryptex')
 const vent = new Vent(parent, () => {
     console.log('callback');
 });
+
+// import ElectricalPuzzle from "./Electrical.js";
+// const parent = document.getElementById('Cryptex');
+// const electrical = new ElectricalPuzzle(parent, 500, 500, {
+//     wireWidth: 10,
+//     wireHeight: 90,
+//     bgColor: 'black'
+// }, ()=>{
+//     console.log('callback');
+// });

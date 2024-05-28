@@ -57,6 +57,7 @@ export default class Vent {
     handleClick(e){
         const {layerX, layerY} = e;
         const closestPt = this.getClosestPoint(layerX, layerY);
+        if (closestPt === null) return;
         this.pts.splice(this.pts.indexOf(closestPt), 1);
         this.redraw();
     }
