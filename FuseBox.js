@@ -12,6 +12,18 @@ export default class FuseBox {
     }
 
     init(){
+        this.image = new Image();
+        this.image.src = 'images/fuse-pzl.png';
+        this.image.onload = () => {
+            this.parentDiv.appendChild(this.image);
+            this.image.style.position = 'absolute';
+            this.image.style.top = '50%';
+            this.image.style.left = '50%';
+            this.image.style.transform = 'translate(-50%, -50%)';
+            this.image.height = '700';
+            this.image.style.zIndex = this.dropZone.element.style.zIndex-1;
+
+        }
         this.dropZone = new DropZone(this.width, this.height, this.x, this.y, this.parentDiv, this.checkForItem.bind(this));
     }
 

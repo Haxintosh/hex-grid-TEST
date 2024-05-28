@@ -228,3 +228,14 @@ new SpinnyVault(parentElement, x, y, src, nTimes, callback, accel, speedLimit); 
 ```js
 vault.destroy(); // destroy
 ```
+
+## Vent
+```js 
+import Vent from "./Vent.js";
+
+const parent = document.getElementById('Cryptex')
+
+const vent = new Vent(parent, () => {
+    console.log('callback');
+});
+```

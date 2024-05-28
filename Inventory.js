@@ -327,7 +327,7 @@ export class DropZone{
             position: relative;
             border: 5px solid rgb(99, 99, 102);
             border-radius: 10px;
-            background-color: #FFFFFF;
+            background-color: transparent;
             pointer-events: none;
              transition: border-style 0.5s, border-color 0.5s;
         }
